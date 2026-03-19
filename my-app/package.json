@@ -1,0 +1,27 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --max-old-space-size=2048 node_modules/.bin/next dev",
+    "chat": "echo 'Chat: http://localhost:3000/chat' && node --max-old-space-size=2048 node_modules/.bin/next dev",
+    "dev:turbo": "node --max-old-space-size=2048 node_modules/.bin/next dev",
+    "build": "node --max-old-space-size=2048 node_modules/.bin/next build",
+    "start": "node --max-old-space-size=2048 node_modules/.bin/next start",
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\""
+  },
+  "dependencies": {
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "prettier": "^3.8.1"
+  }
+}

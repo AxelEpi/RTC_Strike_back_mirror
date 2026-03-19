@@ -1,0 +1,22 @@
+meta {
+  name: put_channel/id
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{end_point}}channels/500be2f0-0a9b-4ddc-a61b-c70f1a42f297
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name":"newTestChannel"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

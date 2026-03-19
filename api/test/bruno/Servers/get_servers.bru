@@ -1,0 +1,15 @@
+meta {
+  name: get_servers
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{end_point}}servers
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

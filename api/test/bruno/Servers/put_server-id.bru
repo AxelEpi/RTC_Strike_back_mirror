@@ -1,0 +1,23 @@
+meta {
+  name: put_server/id
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{end_point}}servers/66b2fb3f-d9a1-4b15-943d-90efbc19a276
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name":"newser vertesst",
+    "description":"description test"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

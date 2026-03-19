@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "ws": "^8.19.0"
+  },
+  "scripts": {
+  "format": "prettier --write .",
+  "format:check": "prettier --check ."
+}
+
+}

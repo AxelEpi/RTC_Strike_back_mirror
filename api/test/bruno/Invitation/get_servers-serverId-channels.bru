@@ -1,0 +1,16 @@
+meta {
+  name: get_servers/serverId/channels
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{end_point}}servers/5dbd0600-2571-49ca-97de-ba1978ea11a5/invitations
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

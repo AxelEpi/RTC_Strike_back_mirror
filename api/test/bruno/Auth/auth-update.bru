@@ -1,0 +1,25 @@
+meta {
+  name: auth/update
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{end_point}}auth/update
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "description":"hello world",
+    "username":"tevvdstsd",
+    "email":"tevsvdts@gmaidl.com",
+    "password":"Password123xx@"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

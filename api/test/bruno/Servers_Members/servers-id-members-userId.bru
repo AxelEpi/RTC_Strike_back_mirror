@@ -1,0 +1,22 @@
+meta {
+  name: servers/id/members/userId
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{end_point}}servers/5dbd0600-2571-49ca-97de-ba1978ea11a5/members/9b860982-3174-4613-b147-0da613b883b3
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "role": "ADMIN"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

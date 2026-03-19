@@ -1,0 +1,23 @@
+meta {
+  name: post_servers/serverId/channels
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{end_point}}servers/5dbd0600-2571-49ca-97de-ba1978ea11a5/invitations
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "max_uses" : 2,
+    "expires_date" :7
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

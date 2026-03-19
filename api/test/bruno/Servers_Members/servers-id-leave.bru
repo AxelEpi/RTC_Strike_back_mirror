@@ -1,0 +1,16 @@
+meta {
+  name: servers/id/leave
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{end_point}}servers/5dbd0600-2571-49ca-97de-ba1978ea11a5/leave
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
