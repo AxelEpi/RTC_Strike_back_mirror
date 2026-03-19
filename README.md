@@ -1,7 +1,7 @@
 -- Active: 1764252690218@@127.0.0.1@8080@mysql
 # RTC - Real Time Chat Application
 
-Application de chat en temps réel (type Discord/Slack) avec serveurs, canaux, rôles et messagerie instantanée.
+Application de chat en temps réel (type Discord) avec serveurs, canaux, rôles et messagerie instantanée.
 
 ## ✨ Fonctionnalités
 
@@ -14,7 +14,7 @@ Application de chat en temps réel (type Discord/Slack) avec serveurs, canaux, r
 
 
 ---
-
+ 
 ## 🚀 Installation
 
 ### 1. Prérequis
