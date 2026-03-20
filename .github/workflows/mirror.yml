@@ -2,8 +2,7 @@ name: Mirror to Epitech
 
 # Se déclenche à chaque push sur n'importe quelle branche
 # C'est ce push qui va aussi envoyer le code vers le repo Epitech
-on:
-  push:
+on: [push]
 
 jobs:
   mirror:
