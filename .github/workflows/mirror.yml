@@ -11,25 +11,9 @@ jobs:
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
+
+      - name: Mirror vers le repo Epitech
+        uses: pixta-dev/repository-mirror-action@v1
         with:
-          fetch-depth: 0 # Récupère TOUT l'historique git, pas juste le dernier commit
-
-      - name: Set up SSH key
-        # Configure la clé SSH privée pour s'authentifier auprès du repo Epitech
-        run: |
-          mkdir -p ~/.ssh
-          # Écrit la clé privée dans le fichier id_ed25519
-          echo "${{ secrets.SSH_PRIVATE }}" > ~/.ssh/id_ed25519
-          # Donne les bons droits sur la clé (obligatoire, SSH refuse si trop permissif)
-          chmod 600 ~/.ssh/id_ed25519
-          # Ajoute github.com aux hôtes connus pour éviter la confirmation manuelle
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-      - name: Push vers le repo Epitech
-        run: |
-          # Utilise l'URL SSH au lieu de HTTPS (pas besoin de token)
-          git remote add epitech git@github.com:EpitechMscProPromo2028/T-DEV-600-MLN_1.git
-          # Pousse toutes les branches
-          git push epitech --all
-          # Pousse tous les tags (nécessaire pour déclencher release.yml)
-          git push epitech --tags
+          target_repo_url: git@github.com:EpitechMscProPromo2028/T-DEV-600-MLN_1.git
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
