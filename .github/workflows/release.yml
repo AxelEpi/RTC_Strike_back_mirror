@@ -1,0 +1,144 @@
+name: Release
+
+# Se déclenche UNIQUEMENT quand tu crées un tag au format vX.X.X
+# Exemple :
+#   git tag v1.0.0
+#   git push origin v1.0.0
+# Le pipeline se lance automatiquement après le push du tag
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+# Droit d'écriture nécessaire pour :
+# - Créer des Releases sur GitHub
+# - Uploader des assets (zip) sur la Release
+permissions:
+  contents: write
+
+jobs:
+  # ─────────────────────────────────────────────
+  # JOB 1 : Création de la Release GitHub
+  # Crée la page Release sur GitHub avec les notes
+  # automatiques générées depuis les commits
+  # Les Jobs 2 et 3 attendent que celui-ci soit
+  # terminé avant de démarrer (voir "needs")
+  # ─────────────────────────────────────────────
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4 # Récupère le code source du repo
+
+      - name: Create release
+        id: create_release # ID référencé par les Jobs 2 et 3 via "needs"
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Token généré automatiquement par GitHub, pas besoin de le configurer manuellement
+        with:
+          tag_name: ${{ github.ref_name }}     # Nom du tag qui a déclenché le pipeline ex: v1.0.0
+          name: Release ${{ github.ref_name }} # Titre affiché sur la page Release ex: "Release v1.0.0"
+          generate_release_notes: true         # Génère automatiquement les notes de release
+                                               # en listant tous les commits depuis le tag précédent
+
+  # ─────────────────────────────────────────────
+  # JOB 2 : Build et upload du Frontend
+  # - Compile my-app/
+  # - Crée un zip avec le build
+  # - Upload le zip sur la Release GitHub
+  #
+  # Tourne EN PARALLÈLE avec le Job 3
+  # mais APRÈS le Job 1 (needs: create_release)
+  # ─────────────────────────────────────────────
+  create_binary_frontend:
+    name: Build & Upload Frontend
+    runs-on: ubuntu-latest
+    needs: create_release # Attend que la Release soit créée avant de démarrer
+    defaults:
+      run:
+        working-directory: ./my-app # Tous les "run" s'exécutent dans ./my-app
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        # Compile le front (Vite, Next.js, etc.)
+        # Génère le dossier dist/ avec les fichiers de production
+        run: npm run build
+
+      - name: Create zip
+        # Crée une archive zip avec :
+        # - dist/        → les fichiers compilés prêts pour la production
+        # - package.json → les infos et dépendances du projet
+        # - README.md    → la documentation
+        # "../" pour sortir de ./my-app et placer le zip à la racine du repo
+        run: zip -r ../release-frontend.zip dist package.json README.md
+
+      - name: Upload frontend zip to Release
+        # Upload le zip comme asset téléchargeable directement
+        # sur la page Release GitHub (visible par tout le monde)
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-frontend.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─────────────────────────────────────────────
+  # JOB 3 : Build et upload du Backend
+  # - Compile api/
+  # - Crée un zip avec le build
+  # - Upload le zip sur la même Release GitHub
+  #
+  # Tourne EN PARALLÈLE avec le Job 2
+  # mais APRÈS le Job 1 (needs: create_release)
+  # ─────────────────────────────────────────────
+  create_binary_api:
+    name: Build & Upload Backend
+    runs-on: ubuntu-latest
+    needs: create_release # Attend aussi que la Release soit créée avant de démarrer
+    defaults:
+      run:
+        working-directory: ./api # Tous les "run" s'exécutent dans ./api
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        # Compile le back
+        # Génère le dossier dist/ avec les fichiers de production
+        run: npm run build
+
+      - name: Create zip
+        # Crée une archive zip avec :
+        # - dist/        → les fichiers compilés prêts pour la production
+        # - package.json → les infos et dépendances du projet
+        # - README.md    → la documentation
+        # "../" pour sortir de ./api et placer le zip à la racine du repo
+        run: zip -r ../release-api.zip dist package.json README.md
+
+      - name: Upload api zip to Release
+        # Upload le zip comme asset téléchargeable directement
+        # sur la page Release GitHub (visible par tout le monde)
+        # Les deux zips (front + back) apparaissent sur la même page Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-api.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

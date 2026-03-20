@@ -1,0 +1,202 @@
+name: CI
+
+# Se déclenche à chaque push sur n'importe quelle branche
+# et à chaque Pull Request ouverte
+on:
+  push:
+  pull_request:
+
+jobs:
+  # ═══════════════════════════════════════════════════════
+  # FRONTEND — ./my-app
+  # Ces 3 jobs tournent EN PARALLÈLE entre eux
+  # ═══════════════════════════════════════════════════════
+
+  # ─────────────────────────────────────────────
+  # JOB 1 : Qualité du code — Frontend
+  # Vérifie le formatage, le linting et les types
+  # ─────────────────────────────────────────────
+  quality-check-front:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./my-app # Tous les "run" s'exécutent dans ./my-app
+    steps:
+      - uses: actions/checkout@v4 # Récupère le code source du repo
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install deps
+        run: npm install # Installe les dépendances du package.json
+
+      - name: Check formatting
+        # Prettier vérifie que le code est bien formaté (indentation, espaces...)
+        # Si un fichier est mal formaté, le job échoue
+        run: npx prettier --check .
+
+      - name: Check linting
+        # ESLint vérifie les règles de style et détecte les erreurs
+        # (variables inutilisées, mauvaises pratiques, etc.)
+        run: npx eslint .
+
+      - name: Type check
+        # TypeScript vérifie que tous les types sont corrects
+        # --noEmit = vérifie sans générer de fichiers de sortie
+        run: npx tsc --noEmit
+
+  # ─────────────────────────────────────────────
+  # JOB 2 : Build et tests — Frontend
+  # Compile le projet et lance les tests
+  # ─────────────────────────────────────────────
+  build-and-test-front:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./my-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Build
+        # Compile le front (Vite, Next.js, etc.)
+        # Génère le dossier dist/ avec les fichiers de production
+        # Si la compilation plante, le job échoue ici
+        run: npm run build
+
+      - name: Tests
+        # Lance tous les tests unitaires et d'intégration
+        # Si un test échoue, le job échoue
+        run: npm test
+
+  # ─────────────────────────────────────────────
+  # JOB 3 : Audit de sécurité — Frontend
+  # Analyse les dépendances pour détecter des failles connues
+  # ─────────────────────────────────────────────
+  security-audit-front:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./my-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Security audit
+        # npm audit analyse toutes les dépendances contre la base de failles connues
+        # --audit-level=high : ne bloque que pour les failles HIGH ou CRITICAL
+        # --json : génère un rapport au format JSON
+        # || true : même si des failles sont trouvées, le job ne bloque pas le pipeline
+        run: npm audit --audit-level=high --json > npm-audit-report.json || true
+
+      - name: Upload audit report
+        # Sauvegarde le rapport JSON dans l'onglet "Artifacts" de GitHub Actions
+        # Tu pourras le télécharger et le consulter depuis l'interface GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report-front # Nom distinct pour ne pas entrer en conflit avec le back
+          path: ./my-app/npm-audit-report.json
+
+  # ═══════════════════════════════════════════════════════
+  # BACKEND — ./api
+  # Ces 3 jobs tournent EN PARALLÈLE entre eux
+  # ET en parallèle avec les jobs frontend ci-dessus
+  # ═══════════════════════════════════════════════════════
+
+  # ─────────────────────────────────────────────
+  # JOB 4 : Qualité du code — Backend
+  # Vérifie le formatage, le linting et les types
+  # ─────────────────────────────────────────────
+  quality-check-back:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api # Tous les "run" s'exécutent dans ./api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Check formatting
+        run: npx prettier --check .
+
+      - name: Check linting
+        run: npx eslint .
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+  # ─────────────────────────────────────────────
+  # JOB 5 : Build et tests — Backend
+  # Compile le projet et lance les tests
+  # ─────────────────────────────────────────────
+  build-and-test-back:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Build
+        # Compile le back
+        # Si la compilation plante, le job échoue ici
+        run: npm run build
+
+      - name: Tests
+        # Lance tous les tests unitaires et d'intégration du backend
+        # Si un test échoue, le job échoue
+        run: npm test
+
+  # ─────────────────────────────────────────────
+  # JOB 6 : Audit de sécurité — Backend
+  # Analyse les dépendances pour détecter des failles connues
+  # ─────────────────────────────────────────────
+  security-audit-back:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Security audit
+        run: npm audit --audit-level=high --json > npm-audit-report.json || true
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report-back # Nom distinct pour ne pas entrer en conflit avec le front
+          path: ./api/npm-audit-report.json
