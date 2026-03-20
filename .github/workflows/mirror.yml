@@ -16,4 +16,4 @@ jobs:
         uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url: git@github.com:EpitechMscProPromo2028/T-DEV-600-MLN_1.git
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE }}
