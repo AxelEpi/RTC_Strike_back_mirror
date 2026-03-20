@@ -129,7 +129,7 @@ docker compose restart test-runner
 ```
 
 24 tests : Auth, Servers, Channels, Members, Invitations
-
+ 
 ---
 
 ## 🔧 Commandes Utiles
